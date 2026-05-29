@@ -4,7 +4,7 @@ RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 COPY . .
 #RUN apt update -y &&  apt install -y build-essentials
-RUN npm install pm2 -g
+RUN npm install pm2@4.5.6 -g
 RUN npm install typescript@3.9.7 -g
 
 #RUN npm install node-gyp -g
@@ -14,7 +14,7 @@ RUN npm install typescript@3.9.7 -g
 #RUN npm install --save bcrypt-nodejs && npm uninstall --save bcrypt
 RUN mkdir uploads -p 
 RUN mkdir temp -p 
-RUN yarn install
+RUN yarn install --ignore-engines
 RUN yarn run initial:online:staging
 RUN tsc -v
 RUN tsc
