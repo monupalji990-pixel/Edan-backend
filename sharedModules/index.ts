@@ -16,10 +16,13 @@ import importMail from "./smallModules/mail";
 import importAws from "./smallModules/aws";
 import importGeneral from "./smallModules/general";
 import importResponse from "./smallModules/responses";
+// outlookGraph (Azure/Microsoft Graph) intentionally NOT imported at startup.
+// This prevents loading @azure/identity in environments where it is not supported/needed.
 smallModules.mail =importMail;
 smallModules.aws =importAws;
 smallModules.general = importGeneral;
 smallModules.responseModule =importResponse;
+
 
 //database modules
 const modules = {};

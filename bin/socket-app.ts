@@ -1,4 +1,7 @@
 const { Server } = require("socket.io");
+// Some socket.io versions export `Server` as the default export.
+// Fallback keeps runtime working across versions.
+const ServerCtor = Server || require("socket.io");
 const session = require('express-session');
 const MongoStore = require('connect-mongo')
 import UsersControllers from "../projects/user/controller";
@@ -7,7 +10,8 @@ var cookie = {
   maxAge: 1209600000,
 };
 
-const io = new Server({ 
+const io = new ServerCtor({ 
+
     cors: {
         origin: "*",
         methods: ["GET", "POST"]

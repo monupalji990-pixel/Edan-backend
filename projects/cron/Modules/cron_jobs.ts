@@ -42,6 +42,20 @@ cron.schedule('0 9 * * *', () => {
     debtServiceEmailReminder()
 });
 
+// Handover pack emails (Graph/Outlook) - first cut runs daily.
+// cron_jobs.ts lives in projects/cron/Modules, so reach projects/handoverEmail via ../../handoverEmail
+const HandoverEmailController = require('../../handoverEmail/controller').default;
+const handoverEmailController = new HandoverEmailController();
+console.log('handoverEmail cron wired');
+cron.schedule('15 9 * * *', async () => {
+    try {
+        await handoverEmailController.cronSendPendingHandoverEmails();
+    } catch (e) {
+        console.log('handoverEmail cron failed', e);
+    }
+});
+
+
 function getDateDDMMYYY(date){
 const yyyy = date.getFullYear();
 let mm = date.getMonth() + 1; // Months start at 0!

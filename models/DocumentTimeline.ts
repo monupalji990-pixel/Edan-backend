@@ -55,6 +55,15 @@ const DocumentTimelineSchema = new mongoose.Schema({
         type:Date,
         default: ()=> new Date()
     },
+    // Handover pack email automation
+    handoverEmailSentAt: {
+        type: Date,
+        default: null,
+    },
+    handoverEmailQuoteId: {
+        type: String,
+        default: null,
+    },
 }, { timestamps: true });
 
 const DocumentTimeline = mongoose.model('DocumentTimeline', DocumentTimelineSchema);
