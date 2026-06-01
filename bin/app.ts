@@ -207,8 +207,9 @@ if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'staging'
 /**
  * Start Express server.
  */
-app.listen(app.get('port'), () => {
-    console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), app.get('port'), app.get('env'));
+const PORT = process.env.PORT || app.get('port') || 3000;
+app.listen(PORT, () => {
+    console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), PORT, app.get('env'));
     console.log('  Press CTRL-C to stop\n');
 });
 // io.listen(4000)
