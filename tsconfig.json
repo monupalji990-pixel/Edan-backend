@@ -9,7 +9,8 @@
         "resolveJsonModule": true,
         "outDir": "./dist",
         "noImplicitThis": false,
-        "allowJs": true
+        "allowJs": true,
+        "skipLibCheck": true
     },
     "include": [
         "bin/*.ts",
