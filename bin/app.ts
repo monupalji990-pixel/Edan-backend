@@ -159,7 +159,15 @@ app.use((req: { user: any; }, res: { locals: { user: any; }; }, next: () => void
 });
 
 app.use(function (req: { headers: { origin: any; }; }, res: { setHeader: (arg0: string, arg1: string | boolean) => void; }, next: () => void) {
-    var allowedOrigins = ['http://localhost:3486', 'http://localhost:8092', 'http://localhost:8080', 'https://edanpower.co.uk', 'http://stage.thepowerportal.co.uk'];
+    var allowedOrigins = [
+        'http://localhost:3486',
+        'http://localhost:8092',
+        'http://localhost:8080',
+        'https://edanpower.co.uk',
+        'http://stage.thepowerportal.co.uk',
+        // Render frontend origin (add if your frontend is hosted there)
+        'https://edan-backend.onrender.com'
+    ];
     var origin = req.headers.origin;
 
     if (allowedOrigins.indexOf(origin) > -1) {
