@@ -83,7 +83,11 @@ if (process.env.NODE_ENV == "development") {
     }
 }
 process.env['mongodb_string'] = String(mongodb_string)
-require('./socket-app')
+console.log("Before socket-app");
+
+require('./socket-app');
+
+console.log("After socket-app");
 
 console.log('Currently working environment is:    ' + process.env.NODE_ENV + " " + mongodb_string);
 mongoose.connect(mongodb_string, { useUnifiedTopology: true });
@@ -109,16 +113,16 @@ app.set('view engine', 'pug');
  * Keep it opt-in to avoid bringing down the API server.
  */
 const shouldEnableStatusMonitor =
-  String(process.env.ENABLE_STATUS_MONITOR || '').toLowerCase() === 'true' &&
-  process.env.NODE_ENV !== 'test' &&
-  process.platform !== 'win32';
+    String(process.env.ENABLE_STATUS_MONITOR || '').toLowerCase() === 'true' &&
+    process.env.NODE_ENV !== 'test' &&
+    process.platform !== 'win32';
 
 if (shouldEnableStatusMonitor) {
-  try {
-    app.use(expressStatusMonitor());
-  } catch (e) {
-    console.warn('express-status-monitor failed to start; continuing without it.', e);
-  }
+    try {
+        app.use(expressStatusMonitor());
+    } catch (e) {
+        console.warn('express-status-monitor failed to start; continuing without it.', e);
+    }
 }
 app.use(compression());
 app.use(sass({
@@ -155,7 +159,7 @@ app.use((req: { user: any; }, res: { locals: { user: any; }; }, next: () => void
 });
 
 app.use(function (req: { headers: { origin: any; }; }, res: { setHeader: (arg0: string, arg1: string | boolean) => void; }, next: () => void) {
-    var allowedOrigins = ['http://localhost:3486', 'http://localhost:8092',  'http://localhost:8080', 'https://edanpower.co.uk', 'http://stage.thepowerportal.co.uk'];
+    var allowedOrigins = ['http://localhost:3486', 'http://localhost:8092', 'http://localhost:8080', 'https://edanpower.co.uk', 'http://stage.thepowerportal.co.uk'];
     var origin = req.headers.origin;
 
     if (allowedOrigins.indexOf(origin) > -1) {
@@ -232,7 +236,7 @@ app.listen(PORT, () => {
 //             status:data.status});
 
 //     })
-  
+
 //     socket.on('connect_error', (err) => {
 //         console.log(`connect_error due to ${err.message}`);
 //       });
