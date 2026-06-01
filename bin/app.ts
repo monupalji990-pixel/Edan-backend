@@ -125,10 +125,10 @@ if (shouldEnableStatusMonitor) {
     }
 }
 app.use(compression());
-app.use(sass({
-    src: path.join(__dirname, 'public'),
-    dest: path.join(__dirname, 'public')
-}));
+// app.use(sass({
+//     src: path.join(__dirname, 'public'),
+//     dest: path.join(__dirname, 'public')
+// }));
 if (process.env.NODE_ENV !== 'test') {
     app.use(logger('dev'));
 }
@@ -212,10 +212,18 @@ if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'staging'
  * Start Express server.
  */
 const PORT = process.env.PORT || app.get('port') || 3000;
-app.listen(PORT, () => {
-    console.log('%s App is running at http://localhost:%d in %s mode', chalk.green('✓'), PORT, app.get('env'));
-    console.log('  Press CTRL-C to stop\n');
-});
+
+console.log("PORT ENV =", process.env.PORT);
+console.log("APP PORT =", app.get("port"));
+console.log("BEFORE LISTEN");
+
+try {
+    app.listen(PORT, () => {
+        console.log("LISTEN SUCCESS", PORT);
+    });
+} catch (err) {
+    console.error("LISTEN ERROR", err);
+}
 // io.listen(4000)
 // httpServer.listen(4000)
 // let users = []
@@ -263,4 +271,6 @@ app.listen(PORT, () => {
 //   });
 module.exports = app;
 
-require('../projects/cron/Modules/cron_jobs')
+console.log("Before cron");
+require('../projects/cron/Modules/cron_jobs');
+console.log("After cron");
