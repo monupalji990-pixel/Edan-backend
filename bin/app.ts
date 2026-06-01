@@ -2,11 +2,13 @@ export { };
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
+import type { Request, Response } from 'express';
 const { createServer } = require("http");
 // const io = require("socket.io")({   cors: {
 //     origin: "*",
 //     methods: ["GET", "POST"]
 //   } });
+
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const chalk = require('chalk');
@@ -158,6 +160,15 @@ app.use((req: { user: any; }, res: { locals: { user: any; }; }, next: () => void
     next();
 });
 
+
+app.get("/health", (req: Request, res: Response) => {
+  // Some @types/express mismatches can lead to `res.send` not being typed.
+  // Cast to `any` to keep runtime behavior correct while unblocking TS compilation.
+  return (res as any).send({
+    success: true,
+    message: "Backend is working",
+  });
+});
 app.use(function (req: { headers: { origin: any; }; }, res: { setHeader: (arg0: string, arg1: string | boolean) => void; }, next: () => void) {
     var allowedOrigins = [
         'http://localhost:3486',
