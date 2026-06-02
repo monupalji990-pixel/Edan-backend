@@ -198,7 +198,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use(function (req: { headers: { origin: any; }; }, res: { setHeader: (arg0: string, arg1: string | boolean) => void; }, next: () => void) {
     var allowedOrigins = [
         'http://localhost:3486',
-        'http://localhost:5173/'
+        'http://localhost:5173/',
         'http://localhost:8092',
         'http://localhost:8080',
         'https://edanpower.co.uk',
