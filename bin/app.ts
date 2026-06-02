@@ -56,35 +56,43 @@ if (process.env.NODE_ENV == "development") {
     mongoose.set('debug', true);
     app.set('port', process.env.DEVELOPMENT_PORT);
     if (process.env.SERVER == "local") {
-        mongodb_string = <String>process.env.DEV_LOCAL_MONGODB_URI;
+        mongodb_string = String(process.env.DEV_LOCAL_MONGODB_URI as any);
     }
 } else if (process.env.NODE_ENV == "test") {
     app.set('port', process.env.DEVELOPMENT_PORT);
     if (process.env.SERVER == "local") {
-        mongodb_string = <String>process.env.TEST_LOCAL_MONGODB_URI;
+        mongodb_string = String(process.env.TEST_LOCAL_MONGODB_URI as any);
     } else {
-        mongodb_string = <String>process.env.TEST_ONLINE_MONGODB_URI;
+        mongodb_string = String(process.env.TEST_ONLINE_MONGODB_URI as any);
     }
 } else if (process.env.NODE_ENV == "staging") {
     app.set('port', process.env.STAGING_PORT);
     mongoose.set('debug', true);
 
     if (process.env.SERVER == "local") {
-        mongodb_string = <String>process.env.STAGING_LOCAL_MONGODB_URI;
+        mongodb_string = String(process.env.STAGING_LOCAL_MONGODB_URI as any);
     } else {
-        mongodb_string = <String>process.env.STAGING_ONLINE_MONGODB_URI;
+        mongodb_string = String(process.env.STAGING_ONLINE_MONGODB_URI as any);
     }
 } else if (process.env.NODE_ENV == "production") {
     // mongoose.set('debug', true);
 
     app.set('port', process.env.PRODUCTION_PORT);
     if (process.env.SERVER == "local") {
-        mongodb_string = <String>process.env.DEV_LOCAL_MONGODB_URI;
+        mongodb_string = String(process.env.DEV_LOCAL_MONGODB_URI as any);
     } else {
-        mongodb_string = <String>process.env.PROD_ONLINE_MONGODB_URI;
+        mongodb_string = String(process.env.PROD_ONLINE_MONGODB_URI as any);
     }
 }
 process.env['mongodb_string'] = String(mongodb_string)
+
+if (!process.env.SESSION_SECRET) {
+    console.error('SESSION_SECRET is not set.');
+    throw new Error('Missing SESSION_SECRET');
+}
+
+const hasMongo = Boolean(mongodb_string && String(mongodb_string).trim().length > 0);
+
 console.log("Before socket-app");
 
 require('./socket-app');
@@ -92,15 +100,20 @@ require('./socket-app');
 console.log("After socket-app");
 
 console.log('Currently working environment is:    ' + process.env.NODE_ENV + " " + mongodb_string);
-mongoose.connect(mongodb_string, { useUnifiedTopology: true });
 
-mongoose
-    .connection
-    .on('error', (err: any) => {
-        console.error(err);
-        console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
-        process.exit();
-    });
+if (hasMongo) {
+    mongoose.connect(mongodb_string, { useUnifiedTopology: true });
+
+    mongoose
+        .connection
+        .on('error', (err: any) => {
+            console.error(err);
+            console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
+        });
+} else {
+    console.error('MongoDB connection string is empty/missing. App will start but /api routes may fail.');
+}
+
 
 /**
  * Express configuration.
@@ -252,6 +265,7 @@ console.log("BEFORE LISTEN");
 try {
     app.listen(PORT, () => {
         console.log("LISTEN SUCCESS", PORT);
+        console.log("PORT =", process.env.PORT);
     });
 } catch (err) {
     console.error("LISTEN ERROR", err);
