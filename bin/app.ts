@@ -161,19 +161,16 @@ app.use((req: { user: any; }, res: { locals: { user: any; }; }, next: () => void
 });
 
 
-HEAD
-app.get("/api", (req: Request, res: Response) => {
-=======
-app.get("/health", (req: Request, res: Response) => {
->>>>>>> 6447978d9fcfb436c1e3609bff03da85975d81ae
+
+app.get('/api/health', (req: Request, res: Response) => {
   // Some @types/express mismatches can lead to `res.send` not being typed.
   // Cast to `any` to keep runtime behavior correct while unblocking TS compilation.
   return (res as any).send({
     success: true,
-    message: "Backend is working",
+    message: 'Backend is working',
   });
 });
-HEAD
+
 
 // Root health page so visiting the live domain shows a friendly message
 app.get('/', (req: Request, res: Response) => {
@@ -183,8 +180,8 @@ app.get('/', (req: Request, res: Response) => {
     '<!doctype html><html><head><meta charset="utf-8"><title>Backend</title></head><body><h1>Backend is running</h1><p>API base: /api</p></body></html>'
   );
 });
-=======
->>>>>>> 6447978d9fcfb436c1e3609bff03da85975d81ae
+
+ 
 app.use(function (req: { headers: { origin: any; }; }, res: { setHeader: (arg0: string, arg1: string | boolean) => void; }, next: () => void) {
     var allowedOrigins = [
         'http://localhost:3486',
