@@ -2,11 +2,13 @@ export { };
 const express = require('express');
 const compression = require('compression');
 const session = require('express-session');
+import type { Request, Response } from 'express';
 const { createServer } = require("http");
 // const io = require("socket.io")({   cors: {
 //     origin: "*",
 //     methods: ["GET", "POST"]
 //   } });
+
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const chalk = require('chalk');
@@ -158,6 +160,24 @@ app.use((req: { user: any; }, res: { locals: { user: any; }; }, next: () => void
     next();
 });
 
+
+app.get("/api", (req: Request, res: Response) => {
+  // Some @types/express mismatches can lead to `res.send` not being typed.
+  // Cast to `any` to keep runtime behavior correct while unblocking TS compilation.
+  return (res as any).send({
+    success: true,
+    message: "Backend is working",
+  });
+});
+
+// Root health page so visiting the live domain shows a friendly message
+app.get('/', (req: Request, res: Response) => {
+  const r: any = res;
+  r.setHeader('Content-Type', 'text/html');
+  return r.send(
+    '<!doctype html><html><head><meta charset="utf-8"><title>Backend</title></head><body><h1>Backend is running</h1><p>API base: /api</p></body></html>'
+  );
+});
 app.use(function (req: { headers: { origin: any; }; }, res: { setHeader: (arg0: string, arg1: string | boolean) => void; }, next: () => void) {
     var allowedOrigins = [
         'http://localhost:3486',
@@ -166,7 +186,7 @@ app.use(function (req: { headers: { origin: any; }; }, res: { setHeader: (arg0: 
         'https://edanpower.co.uk',
         'http://stage.thepowerportal.co.uk',
         // Render frontend origin (add if your frontend is hosted there)
-        'https://edan-backend.onrender.com'
+        'https://edan-backend.onrender.com/api'
     ];
     var origin = req.headers.origin;
 
