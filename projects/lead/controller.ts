@@ -1385,7 +1385,7 @@ class RegUserController {
           coOrdinates.lon = req.body.lon
 
         }
-        console.log("coOrdinates ================================", coOrdinates);
+        console.log("coOrdinates ====", coOrdinates);
 
         SoloarController.createProject(newQuote, lead, coOrdinates)
       }

@@ -222,7 +222,7 @@ class SolarController {
     }
 
     async getDataFromUrl(req:Request,res:Response){
-        console.log("url =========================================", req.body, req.body.url)
+        console.log("url ", req.body, req.body.url)
         try {
             let config = await new SolarController().getToken()
             let data = await axios.get(req.body.url,{

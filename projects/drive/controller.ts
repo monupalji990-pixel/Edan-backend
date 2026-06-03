@@ -271,7 +271,7 @@ class DriveController {
             const tasks = consumers.map(async (consumer, index) => {
                 let checkFolder = await DriveModel.findOne({ Consumer: consumer._id, folderName: 'ECO4' });
                 if (checkFolder) {
-                    console.log(`Added =============>>>>>>>>----------------->\n: ${index}, consumer._id: ${consumer._id}`);
+                    console.log(`Added >>>>>>>>----------------->\n: ${index}, consumer._id: ${consumer._id}`);
                     // await addDefaultFolders(consumer);
                     const newFolder = {
                         Consumer: consumer._id,

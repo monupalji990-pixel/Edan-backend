@@ -3,12 +3,12 @@
 // Bootswatch
 
 
-// Variables ===================================================================
+// Variables ====
 
 $web-font-path: "https://fonts.googleapis.com/css?family=Lato:400,700,400italic" !default;
 @import url($web-font-path);
 
-// Navbar =======================================================================
+// Navbar =
 
 .bg-primary {
   .navbar-nav .active > .nav-link {
@@ -27,7 +27,7 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Lato:400,700,400italic"
   }
 }
 
-// Buttons =====================================================================
+// Buttons 
 
 .btn {
   &-secondary,
@@ -38,9 +38,9 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Lato:400,700,400italic"
   }
 }
 
-// Typography ==================================================================
+// Typography ===
 
-// Tables ======================================================================
+// Tables 
 
 .table {
 
@@ -166,9 +166,9 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Lato:400,700,400italic"
   }
 }
 
-// Forms =======================================================================
+// Forms =
 
-// Navs ========================================================================
+// Navs ==
 
 .nav-tabs {
   .nav-link.active,
@@ -187,7 +187,7 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Lato:400,700,400italic"
   }
 }
 
-// Indicators ==================================================================
+// Indicators ===
 
 .close {
   text-decoration: none;
@@ -235,9 +235,9 @@ $web-font-path: "https://fonts.googleapis.com/css?family=Lato:400,700,400italic"
   }
 }
 
-// Progress bars ===============================================================
+// Progress bars 
 
-// Containers ==================================================================
+// Containers ===
 .modal .close{
   color: $black;
 
