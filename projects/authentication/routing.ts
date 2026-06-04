@@ -7,7 +7,7 @@ const authObj = new AuthController();
 
 router.post('/', authObj.index);
 router.post('/login', authObj.login);
-// router.get('/isLoggedIn', passportConfig.isAuthenticated, authObj.isLoggedIn);
+router.get('/isLoggedIn', passportConfig.isAuthenticated, authObj.isLoggedIn);
 // router.get('/logout', passportConfig.isAuthenticated, authObj.logout);
 router.get('/new-update', authObj.NewUpdate);
 router.get("/get-all-users", authObj.getAllUsers);

@@ -103,7 +103,7 @@ export default class UserGeneralAPI extends ControllerUtils {
       };
     }
     try {
-      var countQuery = await UserModel.count(filter);
+      var countQuery = await UserModel.countDocuments(filter);
       var dataQuery = await general
         .commanFindQuery(UserModel.find(filter), req.query)
         .populate({ path: "role", select: "roleName" })

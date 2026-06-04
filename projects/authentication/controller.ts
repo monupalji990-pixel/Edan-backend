@@ -126,7 +126,11 @@ export default class authControllers extends ControllerUtils {
   };
 
   isLoggedIn(req: Request, res: Response) {
-    //added roleName
+    // added roleName
+    if (!req.user || !req.user._id) {
+      return res.send({ success: false, err: 'Not authenticated', status: responseStatusCode.UNAUTHORIZED || 1004 });
+    }
+
     commandUtils.newFindQuery(User, {
       filterType: 'byid',
       filter: {

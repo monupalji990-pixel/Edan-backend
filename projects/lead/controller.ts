@@ -1032,9 +1032,9 @@ class RegUserController {
         }
         else if (update?.status === 'DND') {
           // lead and company is delete
-          let quoteCount = await QuoteModel.find({ Company: previousObject.Company }).countDocuments();
-          let renewalCount = await RenewalModel.find({ Company: previousObject.Company }).countDocuments();
-          let leadCount = await LeadModel.find({ Company: previousObject.Company }).countDocuments();
+          let quoteCount = await QuoteModel.countDocuments({ Company: previousObject.Company });
+          let renewalCount = await RenewalModel.countDocuments({ Company: previousObject.Company });
+          let leadCount = await LeadModel.countDocuments({ Company: previousObject.Company });
           let total = quoteCount + renewalCount + leadCount;
           // if (req.user.role.roleName === 'Admin') {
           isLeadDeleted = true;
@@ -1071,10 +1071,10 @@ class RegUserController {
         }
         else if (update?.status === 'DND') {
           // lead and company is delete
-          let quoteCount = await QuoteModel.find({ Consumer: previousObject.Consumer }).countDocuments();
-          let renewalCount = await RenewalModel.find({ Consumer: previousObject.Consumer }).countDocuments();
-          let leadCount = await LeadModel.find({ Consumer: previousObject.Consumer }).countDocuments();
-          let taskCount = await TaskModel.find({ Consumer: previousObject.Consumer }).countDocuments();
+          let quoteCount = await QuoteModel.countDocuments({ Consumer: previousObject.Consumer });
+          let renewalCount = await RenewalModel.countDocuments({ Consumer: previousObject.Consumer });
+          let leadCount = await LeadModel.countDocuments({ Consumer: previousObject.Consumer });
+          let taskCount = await TaskModel.countDocuments({ Consumer: previousObject.Consumer });
 
           let total = quoteCount + renewalCount + leadCount;
           // if (req.user.role.roleName === 'Admin') {
@@ -1241,21 +1241,17 @@ class RegUserController {
 
   async sourceStats(req: Request, res: Response) {
     try {
-      let sourceList = await LeadModel.distinct('source');
-
-      let promises = [];
-      sourceList.forEach(p => {
-        let data = LeadModel.countDocuments({ source: p });
-        promises.push(data);
-      })
-
-      let result = await Promise.all(promises)
+      // OPTIMIZED: Use aggregation instead of distinct + multiple countDocuments queries
+      let statsResult = await LeadModel.aggregate([
+        { $match: { source: { $ne: null } } },
+        { $group: { _id: '$source', count: { $sum: 1 } } },
+        { $sort: { count: -1 } }
+      ]);
 
       let response = {};
-      sourceList.forEach((p, i) => {
-        console.log(result[i])
-        if (p !== null)
-          response[sourceList[i]] = result[i]
+      statsResult.forEach(item => {
+        if (item._id !== null)
+          response[item._id] = item.count;
       })
 
       return res.send({ success: true, data: response })
@@ -1343,12 +1339,12 @@ class RegUserController {
 
       if (lead.Consumer !== undefined && lead.Consumer) {
         const ConsumerInfo = await UserModel.findOne({ _id: lead.Consumer });
-        let count = await QuoteModel.find({ Consumer: lead.Consumer }).countDocuments();
+        let count = await QuoteModel.countDocuments({ Consumer: lead.Consumer });
         quoteData.QuoteID = `Q${(Number(count) + 1)}-${ConsumerInfo.consumerId}`;
         quoteData.Consumer = ConsumerInfo._id;
       } else {
         const CompanyInfo = await CompanyModel.findOne({ _id: lead.Company });
-        let count = await QuoteModel.find({ Company: lead.Company }).countDocuments();
+        let count = await QuoteModel.countDocuments({ Company: lead.Company });
         quoteData.QuoteID = `Q${(Number(count) + 1)}-${CompanyInfo.companyID}`;
         quoteData.Company = CompanyInfo._id;
         quoteData.Site = lead.Site;
