@@ -156,7 +156,7 @@ class HistoryController {
             let sortObj: any = { updatedAt: 1 };
             if (query.sort) sortObj = { [query.sort]: query.sortType === 'asc' ? 1 : -1 };
             let skipNumber = 0;
-            let limitNumber = 99999;
+            let limitNumber = 99;
             if (query.skip) skipNumber = Number(query.skip);
             if (query.limit) limitNumber = Number(query.limit);
 

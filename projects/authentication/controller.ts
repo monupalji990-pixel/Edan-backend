@@ -18,7 +18,7 @@ export default class authControllers extends ControllerUtils {
     req
       .assert('password', 'Password cannot be blank')
       .notEmpty();
-      
+      console.log('Request Body:', req.body); // Debugging line to check the request body
     const errors = req.validationErrors();
 
     if (errors) {

@@ -430,13 +430,18 @@ class RegUserController {
         sortObj = { [req.query.sort]: req.query.sortType === 'asc' ? 1 : -1 };
       }
       let skipNumber = 0;
-      let limitNumber = 99999;
+      let limitNumber = 99;
       if (req.query.skip) skipNumber = Number(req.query.skip);
-      if (req.query.limit) limitNumber = Number(req.query.limit);
-
+      if (req.query.limit) limitNumber = Math.min(Number(req.query.limit), 100); // cap page size
+      // Ensure filtering runs before sorting to allow index use
       const leads = LeadModel.aggregate([
-        { $sort: sortObj },
         { $match: filterBeforeLookup },
+        { $match: filter },
+        { $sort: sortObj },
+        // apply pagination before lookups to reduce documents processed by joins
+        { $skip: skipNumber },
+        { $limit: limitNumber },
+        // perform lookups only for the paginated subset
         {
           $lookup: {
             from: 'companies',
@@ -507,9 +512,6 @@ class RegUserController {
             "preserveNullAndEmptyArrays": true
           }
         },
-        { $match: filter },
-        { $skip: skipNumber },
-        { $limit: limitNumber },
         {
           $project: {
             source: 1,
@@ -761,12 +763,12 @@ class RegUserController {
         sortObj = { [req.query.sort]: req.query.sortType === 'asc' ? 1 : -1 };
       }
       let skipNumber = 0;
-      let limitNumber = 99999;
+      let limitNumber = 99;
       if (req.query.skip) skipNumber = Number(req.query.skip);
-      if (req.query.limit) limitNumber = Number(req.query.limit);
+      if (req.query.limit) limitNumber = Math.min(Number(req.query.limit), 100);
 
+      // Apply lead-level filters before performing lookups; this reduces documents entering the join stages.
       const count = await LeadModel.aggregate([
-        { $sort: sortObj },
         { $match: filterBeforeLookup },
         {
           $lookup: {
@@ -862,12 +864,16 @@ class RegUserController {
           sortObj = { [req.query.sort]: req.query.sortType === 'asc' ? 1 : -1 };
         }
 
+        let skip = isNaN(Number(req.query.skip)) ? 0 : Number(req.query.skip);
+        let limit = Math.min(Number(req.query.limit) || 50, 100);
+
+        // Filter first, then sort, paginate, and lookup only for the page
         const leads = await LeadModel.aggregate([
-          { $sort: sortObj },
           { $match: filterBeforeLookup },
           { $match: filter },
-          { $skip: isNaN(Number(req.query.skip)) ? 0 : Number(req.query.skip) },
-          { $limit: Number(req.query.limit) },
+          { $sort: sortObj },
+          { $skip: skip },
+          { $limit: limit },
           {
             $lookup: {
               from: 'sites',
@@ -1120,23 +1126,35 @@ class RegUserController {
         update.status = "New Lead";
       }
       if (req.body.assignee) update.Assignee = req.body.assignee;
-      await req.body.leadIds.forEach(async (element) => {
-        await LeadModel.updateOne({ _id: element }, update);
-        const lead = await LeadModel.findById(element);
 
-        let data: any = {};
-        if (lead && lead.Company) data = await CompanyModel.findOne(lead.Company);
-        if (lead && lead.Consumer) data = await UserModel.findOne(lead.Consumer);
+      // Bulk update leads
+      const leadIds = Array.isArray(req.body.leadIds) ? req.body.leadIds : [];
+      await LeadModel.updateMany({ _id: { $in: leadIds } }, update);
 
-        const aa = data.Assignee;
-        aa.push(req.body.assignee);
-        const UniqueAssignee = aa.filter((value, index, self) => {
-          return self.indexOf(value) === index;
-        })
+      // Bulk-fatch related Company and Consumer ids to avoid N+1
+      const leads = await LeadModel.find({ _id: { $in: leadIds } }).select('Company Consumer').lean();
+      const companyIds = [...new Set(leads.filter(l => l.Company).map(l => String(l.Company)))];
+      const consumerIds = [...new Set(leads.filter(l => l.Consumer).map(l => String(l.Consumer)))];
 
-        if (lead && lead.Company) await CompanyModel.updateOne({ _id: lead.Company }, { Assignee: UniqueAssignee });
-        if (lead && lead.Consumer) await UserModel.updateOne({ _id: lead.Consumer }, { Assignee: UniqueAssignee });
-      });
+      // Update companies' Assignee lists in parallel
+      if (companyIds.length > 0) {
+        const companies = await CompanyModel.find({ _id: { $in: companyIds } }).select('Assignee').lean();
+        await Promise.all(companies.map(c => {
+          const existing = Array.isArray(c.Assignee) ? c.Assignee.map(String) : [];
+          const union = [...new Set([...existing, String(req.body.assignee)])];
+          return CompanyModel.updateOne({ _id: c._id }, { Assignee: union });
+        }));
+      }
+
+      // Update consumers' Assignee lists in parallel
+      if (consumerIds.length > 0) {
+        const consumers = await UserModel.find({ _id: { $in: consumerIds } }).select('Assignee').lean();
+        await Promise.all(consumers.map(u => {
+          const existing = Array.isArray(u.Assignee) ? u.Assignee.map(String) : [];
+          const union = [...new Set([...existing, String(req.body.assignee)])];
+          return UserModel.updateOne({ _id: u._id }, { Assignee: union });
+        }));
+      }
       res.send({ success: true });
     } catch (err) {
       commonUtils.sendErrorResponse(req, res, err);

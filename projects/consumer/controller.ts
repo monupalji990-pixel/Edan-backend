@@ -401,7 +401,7 @@ class RegUserController {
             let sortObj: any = { updatedAt: 1 };
             if (query.sort) sortObj = { [query.sort]: query.sortType === 'asc' ? 1 : -1 };
             let skipNumber = 0;
-            let limitNumber = 99999;
+            let limitNumber = 99;
             if (query.skip) skipNumber = Number(query.skip);
             if (query.limit) limitNumber = Number(query.limit);
             if (req.query.Assignee) {
@@ -500,7 +500,7 @@ class RegUserController {
             commonUtils.commonFilter(req, filter, stuff);
             let sortObj: any = { updatedAt: 1 };
             if (req.query.sort) sortObj = { [req.query.sort]: req.query.sortType === 'asc' ? 1 : -1 };
-            let limitNumber = 99999;
+            let limitNumber = 99;
             if (req.query.limit) limitNumber = Number(req.query.limit);
             const query = ConsumerModel.aggregate([
                 { $match: filter },

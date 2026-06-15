@@ -231,7 +231,7 @@ export default class TaskController extends ControllerUtils {
         let sortObj: any = { updatedAt: 1 };
         if (req.query.sort) sortObj = { [req.query.sort]: req.query.sortType === 'asc' ? 1 : -1 };
         let skipNumber = 0;
-        let limitNumber = 99999;
+        let limitNumber = 99;
         if (req.query.skip) skipNumber = Number(req.query.skip);
         if (req.query.limit) limitNumber = Number(req.query.limit);
 

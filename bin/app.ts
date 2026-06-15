@@ -176,8 +176,7 @@ app.use((req: { user: any; }, res: { locals: { user: any; }; }, next: () => void
 
 
 app.get('/api/health', (req: Request, res: Response) => {
-  // Some @types/express mismatches can lead to `res.send` not being typed.
-  // Cast to `any` to keep runtime behavior correct while unblocking TS compilation.
+  
   return (res as any).send({
     success: true,
     message: 'Backend is working',

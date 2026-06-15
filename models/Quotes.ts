@@ -60,6 +60,8 @@ const QuoteSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Lead'
     },
+
+    // ---- Fast list query indexes (created below via QuoteSchema.index) ----
     Company: {
         type: ObjectId,
         ref: 'Company',
@@ -671,6 +673,15 @@ const QuoteSchema = new mongoose.Schema({
     digitalDashboard: Object
 
 }, { timestamps: true, minimize: false });
+
+// Indexes to speed up list/lead/company/consumer filtering in listOfQuotes
+// These are based on controller.ts listOfQuotes filter usage + sort by updatedAt/createdAt.
+// Note: MongoDB needs these indexes built in the collection (happens automatically on startup in many setups).
+QuoteSchema.index({ Assignee: 1, isActive: 1, isDelete: 1, quoteStatus: 1, updatedAt: -1 });
+QuoteSchema.index({ Company: 1, isActive: 1, isDelete: 1, quoteStatus: 1, updatedAt: -1 });
+QuoteSchema.index({ Consumer: 1, isActive: 1, isDelete: 1, quoteStatus: 1, updatedAt: -1 });
+QuoteSchema.index({ BlockedBy: 1, isActive: 1, isDelete: 1, quoteStatus: 1, updatedAt: -1 });
+QuoteSchema.index({ serviceType: 1, isActive: 1, isDelete: 1, quoteStatus: 1, updatedAt: -1 });
 
 const Quote = mongoose.model('Quote', QuoteSchema);
 
